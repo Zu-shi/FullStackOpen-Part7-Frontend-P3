@@ -18,14 +18,23 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-  // ...
+  const update = async () => {
+    console.log("update")
+    const response = await axios.get(baseUrl)
+    console.log(resources)
+    setResources(response.data)
+    return response.data
+  }
 
-  const create = (resource) => {
-    // ...
+  const create = async newObject => {
+    console.log("create")
+    const response = await axios.post(baseUrl, newObject)
+    setResources(resources.concat(response.data))
+    return response.data
   }
 
   const service = {
-    create
+    create, update
   }
 
   return [
@@ -45,11 +54,13 @@ const App = () => {
     event.preventDefault()
     noteService.create({ content: content.value })
   }
- 
+
   const handlePersonSubmit = (event) => {
     event.preventDefault()
-    personService.create({ name: name.value, number: number.value})
+    personService.create({ name: name.value, number: number.value })
   }
+
+  useEffect(() => { noteService.update(); personService.update() }, [])
 
   return (
     <div>
@@ -62,7 +73,7 @@ const App = () => {
 
       <h2>persons</h2>
       <form onSubmit={handlePersonSubmit}>
-        name <input {...name} /> <br/>
+        name <input {...name} /> <br />
         number <input {...number} />
         <button>create</button>
       </form>
